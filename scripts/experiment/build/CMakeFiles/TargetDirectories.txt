@@ -1,0 +1,3 @@
+/home/zf/deeplearning/caffe/scripts/experiment/build/CMakeFiles/edit_cache.dir
+/home/zf/deeplearning/caffe/scripts/experiment/build/CMakeFiles/rebuild_cache.dir
+/home/zf/deeplearning/caffe/scripts/experiment/build/CMakeFiles/generate_image.dir

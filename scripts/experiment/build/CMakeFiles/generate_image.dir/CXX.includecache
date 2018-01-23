@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zf/deeplearning/caffe/scripts/experiment/facial_experiment.cpp
+opencv2/opencv.hpp
+-
+iostream
+-
+fstream
+-
+sstream
+-
+string
+-
+vector
+-
+unistd.h
+-
+sys/stat.h
+-
+
