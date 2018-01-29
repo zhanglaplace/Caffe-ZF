@@ -18,9 +18,9 @@ namespace caffe{
 	template <typename Dtype>
 	void LabelMarginLayer<Dtype>::Reshape(const vector<Blob<Dtype> *>& bottom,
 		const vector<Blob<Dtype> *>& top){
-		top[0]->ReshapeLike(*bottom[0]);
-		squar_sin_data.ReshapeLike(*bottom[0]);
-		one_data.ReshapeLike(*bottom[0]);
+		top[0]->Reshape(bottom[0]->num(),bottom[0]->channels(),bottom[0]->height(),bottom[0]->width());
+//		squar_sin_data.Reshape(bottom[0]->num(),bottom[0]->channels(),bottom[0]->height(),bottom[0]->width());
+//		one_data.Reshape(bottom[0]->num(),bottom[0]->channels(),bottom[0]->height(),bottom[0]->width());
 	}
 
 
@@ -34,14 +34,11 @@ namespace caffe{
 		const Dtype* bottom_data = bottom[0]->cpu_data();
 		const Dtype* label_data = bottom[1]->cpu_data();
 		Dtype* top_data = top[0]->mutable_cpu_data();
-		int num = bottom[0]->num();
+        int num = bottom[0]->num();
 		int count = bottom[0]->count();
 		int dim = count / num; // Í¨³£Îª1
 
 		caffe_copy(count, bottom_data, top_data);
-		caffe_sqr(count, bottom_data, squar_sin_data.mutable_cpu_data());
-		caffe_set(count, Dtype(1), one_data.mutable_cpu_data());
-		caffe_cpu_axpby(count, Dtype(1), one_data.cpu_data(), Dtype(-1), squar_sin_data.mutable_cpu_data());
 
 
 		if (!transform_test_ &&this->phase_ == TEST)
@@ -49,7 +46,8 @@ namespace caffe{
 		for (int i = 0; i < num; i++){
 			int gt = static_cast<int>(label_data[i]);
 			if (bottom_data[i*dim+gt] > sin_m){
-				top_data[i*dim + gt] = bottom_data[i*dim + gt] * cos_m - sqrt(squar_sin_data.cpu_data()[i*dim+gt])*sin_m;
+                Dtype cos_theta = bottom_data[i*dim+gt];
+                top_data[i*dim + gt] = cos_theta * cos_m - sqrt(1-cos_theta*cos_theta)*sin_m;
 			}
 		}
 	}
@@ -79,7 +77,8 @@ namespace caffe{
 			for (int i = 0; i < num; i++){
 				int gt = static_cast<int>(label_data[i]);
 				if (bottom_data[i*dim + gt] > sin_m){
-					bottom_diff[i*dim + gt] *= (-sqrt(squar_sin_data.cpu_data()[i*dim + gt]) * cos_m - bottom_data[i*dim+gt]*sin_m);
+                    Dtype cos_theta = bottom_data[i*dim+gt];
+					bottom_diff[i*dim + gt] *= (-sqrt(1-cos_theta*cos_theta) * cos_m - cos_theta*sin_m);
 				}
 			}
 		}

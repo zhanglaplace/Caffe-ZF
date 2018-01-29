@@ -33,8 +33,8 @@ namespace caffe{
 
 		Dtype bias_;
 		bool transform_test_;
-		Blob<Dtype> squar_sin_data;
-		Blob<Dtype> one_data;
+		//Blob<Dtype> squar_sin_data;
+		//Blob<Dtype> one_data;
 	};
 }// namespace caffe
 

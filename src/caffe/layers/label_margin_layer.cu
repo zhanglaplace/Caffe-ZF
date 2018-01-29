@@ -9,13 +9,16 @@ namespace caffe {
 
 	template <typename Dtype>
 	__global__ void LabelMarginForward(const int n, const int dim, const Dtype* label,
-		Dtype* top_data, const Dtype* bottom_data,Dtype cos_m,const Dtype* sqrt_sin_data,Dtype sin_m) {
+		Dtype* top_data, const Dtype* bottom_data,Dtype cos_m,Dtype sin_m) {
 		CUDA_KERNEL_LOOP(index, n) {
 			int gt = static_cast<int>(label[index]);
-			if (bottom_data[index * dim + gt] > sin_m) 
-				top_data[index * dim + gt] = bottom_data[index* dim+ gt]*cos_m - sqrt(sqrt_sin_data[index*dim+gt])*sin_m;
+			if (bottom_data[index * dim + gt] > sin_m){ 
+                Dtype cos_theta = bottom_data[index*dim+gt];
+				top_data[index * dim + gt] = cos_theta*cos_m - sqrt(1-cos_theta*cos_theta)*sin_m;
+
 		}
 	}
+    }
 
 	template <typename Dtype>
 	void LabelMarginLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
@@ -26,34 +29,32 @@ namespace caffe {
 		const Dtype* bottom_data = bottom[0]->gpu_data();
 		const Dtype* label_data = bottom[1]->gpu_data();
 		Dtype* top_data = top[0]->mutable_gpu_data();
-
 		int num = bottom[0]->num();
 		int count = bottom[0]->count();
 		int dim = count / num; // Í¨³£Îª1
 
-		caffe_copy(count, bottom_data, top_data);
-		caffe_sqr(count, bottom_data, squar_sin_data.mutable_gpu_data());
-		caffe_set(count,Dtype(1), one_data.mutable_gpu_data());
-		caffe_cpu_axpby(count, Dtype(1), one_data.gpu_data(), Dtype(-1), squar_sin_data.mutable_gpu_data());
+        caffe_copy(count, bottom_data, top_data);
 
 		if (!transform_test_ && this->phase_ == TEST) return;
 
 		// NOLINT_NEXT_LINE(whitespace/operators)
 		LabelMarginForward<Dtype> << <CAFFE_GET_BLOCKS(num), CAFFE_CUDA_NUM_THREADS >> > (
-			num, dim, label_data, top_data, bottom_data,cos_m,squar_sin_data.gpu_data(),sin_m);
+			num, dim, label_data, top_data, bottom_data,cos_m,sin_m);
 		CUDA_POST_KERNEL_CHECK;
 	}
 
 
 	template <typename Dtype>
 	__global__ void LabelMarginBackward(const int n, const int dim, const Dtype* label,
-		Dtype* bottom_diff,  const Dtype* sqrt_sin_data, Dtype cos_m, const Dtype* bottom_data, Dtype sin_m) {
+		Dtype* bottom_diff,Dtype cos_m, const Dtype* bottom_data, Dtype sin_m) {
 		CUDA_KERNEL_LOOP(index, n) {
 			int gt = static_cast<int>(label[index]);
-			if (bottom_data[index * dim + gt] > sin_m)
-				bottom_diff[index * dim + gt] *= (-sqrt(sqrt_sin_data[index*dim+gt])*cos_m-bottom_data[index*dim+gt]*sin_m);
+			if (bottom_data[index * dim + gt] > sin_m){
+                Dtype cos_theta = bottom_data[index*dim+gt];
+				bottom_diff[index * dim + gt] *= (-sqrt(1-cos_theta*cos_theta)*cos_m-cos_theta*sin_m);
 		}
 	}
+    }
 
 
 	template <typename Dtype>
@@ -80,7 +81,7 @@ namespace caffe {
 				return;
 
 			LabelMarginBackward<Dtype> << <CAFFE_GET_BLOCKS(num), CAFFE_CUDA_NUM_THREADS >> > (
-				num, dim, label_data, bottom_diff, squar_sin_data.gpu_data(), cos_m, bottom_data, sin_m);
+				num, dim, label_data, bottom_diff,cos_m, bottom_data, sin_m);
 			CUDA_POST_KERNEL_CHECK;
 
 		}
