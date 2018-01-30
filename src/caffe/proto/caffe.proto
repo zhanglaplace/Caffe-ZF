@@ -423,6 +423,7 @@ message LayerParameter {
   optional LabelSpecificAddParameter label_specific_add_param = 163;
   optional SoftmaxLossWithOHEMParameter softmax_with_loss_param = 164;
   optional LabelMarginParameter label_margin_param = 165;
+  optional LabelSpecificMarginParameter label_specific_margin_param= 166;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1606,4 +1607,22 @@ message SoftmaxLossWithOHEMParameter{
 message LabelMarginParameter {
   optional float bias = 1;
   optional bool transform_test = 2 [default = false];
+}
+
+message LabelSpecificMarginParameter {
+  enum MarginType {
+    HARD = 0;
+    SOFT = 1;
+  }
+  optional MarginType type = 9 [default = HARD];
+  optional float margin_base = 1 [default =0.0];
+  optional float margin_max = 2 [default = 10.0];
+  optional float power = 3 [default = 1.0];
+  optional float gamma = 4 [default = 1.0];
+  optional int32 iteration = 5 [default = 0];
+  optional bool reset_margin = 6 [default = false];
+  optional bool margin_on_test = 7 [default = false];
+  optional bool auto_tune = 8 [default = false];
+  optional bool pass_bp = 10 [default = false];
+
 }
