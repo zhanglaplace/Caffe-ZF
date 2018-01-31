@@ -43,3 +43,8 @@ Please cite Caffe in your publications if it helps your research:
       Title = {Caffe: Convolutional Architecture for Fast Feature Embedding},
       Year = {2014}
     }
+
+多GPU 需要use_NCCL
+$ git clone https://github.com/NVIDIA/nccl.git
+$ cd nccl
+$ sudo make install -j
