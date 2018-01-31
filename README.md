@@ -45,6 +45,9 @@ Please cite Caffe in your publications if it helps your research:
     }
 
 多GPU 需要use_NCCL
+
 $ git clone https://github.com/NVIDIA/nccl.git
+
 $ cd nccl
+
 $ sudo make install -j
