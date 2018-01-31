@@ -423,7 +423,8 @@ message LayerParameter {
   optional LabelSpecificAddParameter label_specific_add_param = 163;
   optional SoftmaxLossWithOHEMParameter softmax_with_loss_param = 164;
   optional LabelMarginParameter label_margin_param = 165;
-  optional LabelSpecificMarginParameter label_specific_margin_param= 166;
+  optional LabelSpecificMarginParameter label_specific_margin_param= 166;  
+  optional AxpyParameter axpy_param = 167;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1625,4 +1626,8 @@ message LabelSpecificMarginParameter {
   optional bool auto_tune = 8 [default = false];
   optional bool pass_bp = 10 [default = false];
 
+}
+
+message AxpyParameter {
+  optional int32 tmp = 1 [default = 0];
 }
