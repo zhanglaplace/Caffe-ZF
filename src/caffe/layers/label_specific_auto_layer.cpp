@@ -8,7 +8,7 @@ namespace caffe {
   template <typename Dtype>
   void LabelSpecificAutoLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
                                                     const vector<Blob<Dtype>*>& top) {
-    const LabelSpecificAddParameter& param = this->layer_param_.label_specific_auto_param();
+    const LabelSpecificAutoParameter& param = this->layer_param_.label_specific_auto_param();
     bias_ = param.bias();
     transform_test_ = param.transform_test() & (this->phase_ == TRAIN);
     anneal_bias_ = param.has_bias_base();
