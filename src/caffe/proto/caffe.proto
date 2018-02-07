@@ -425,6 +425,8 @@ message LayerParameter {
   optional LabelMarginParameter label_margin_param = 165;
   optional LabelSpecificMarginParameter label_specific_margin_param= 166;  
   optional AxpyParameter axpy_param = 167;
+  optional LabelSpecificAutoParameter label_specific_auto_param= 168;  
+  optional ChannelScaleParameter channel_scale_param= 169;  
 }
 
 // Message that stores parameters used to apply transformation
@@ -1630,4 +1632,25 @@ message LabelSpecificMarginParameter {
 
 message AxpyParameter {
   optional int32 tmp = 1 [default = 0];
+}
+
+message LabelSpecificAutoParameter{
+  optional float bias = 1 [default = 0.0];
+  optional bool transform_test = 2 [default = false];
+  optional float bias_base = 3 [default = 0.0];
+  optional float bias_gamma = 4 [default = 0.0];
+  optional float bias_power = 5 [default = 1.0];
+  optional float bias_min = 6 [default =0.0];
+  optional float bias_max = 7 [default =0.0];
+  optional uint32 iteration = 8 [default = 0];
+}
+
+message ChannelScaleParameter{
+  optional bool do_forward = 1 [default = true];
+  optional bool do_backward_feature = 2 [default = true];
+  optional bool do_backward_scale = 3 [default = true];
+  optional bool global_scale = 4 [default = false];
+  optional float max_global_scale = 5 [default = 1000.0];
+  optional float min_global_scale = 6 [default = 0.0];
+  optional float init_global_scale = 7 [default = 1.0];
 }
