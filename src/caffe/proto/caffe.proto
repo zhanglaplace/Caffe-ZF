@@ -423,10 +423,12 @@ message LayerParameter {
   optional LabelSpecificAddParameter label_specific_add_param = 163;
   optional SoftmaxLossWithOHEMParameter softmax_with_loss_param = 164;
   optional LabelMarginParameter label_margin_param = 165;
-  optional LabelSpecificMarginParameter label_specific_margin_param= 166;  
+  optional LabelSpecificMarginParameter label_specific_margin_param= 166;
   optional AxpyParameter axpy_param = 167;
-  optional LabelSpecificAutoParameter label_specific_auto_param= 168;  
-  optional ChannelScaleParameter channel_scale_param= 169;  
+  optional CenterProjectionParameter center_projection_param = 168;
+  optional LabelSpecificAutoParameter label_specific_auto_param = 169;
+  optional ChannelScaleParameter channel_scale_param = 170;
+  optional AngularTripletParameter angular_triplet_param = 171;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1611,7 +1613,6 @@ message LabelMarginParameter {
   optional float bias = 1;
   optional bool transform_test = 2 [default = false];
 }
-
 message LabelSpecificMarginParameter {
   enum MarginType {
     HARD = 0;
@@ -1627,11 +1628,20 @@ message LabelSpecificMarginParameter {
   optional bool margin_on_test = 7 [default = false];
   optional bool auto_tune = 8 [default = false];
   optional bool pass_bp = 10 [default = false];
-
 }
 
 message AxpyParameter {
-  optional int32 tmp = 1 [default = 0];
+  optional uint32 bias = 1 [default = 0];
+}
+
+message CenterProjectionParameter {
+  optional uint32 num_output = 1;
+  optional bool bias_term = 2 [default = true];
+  optional FillerParameter weight_filler = 3;
+  optional FillerParameter bias_filler = 4;
+  optional int32 axis = 5 [default = 1];
+  optional bool transpose = 6 [default = false];
+  optional float scale = 7 [default = 1.0];
 }
 
 message LabelSpecificAutoParameter{
@@ -1640,12 +1650,12 @@ message LabelSpecificAutoParameter{
   optional float bias_base = 3 [default = 0.0];
   optional float bias_gamma = 4 [default = 0.0];
   optional float bias_power = 5 [default = 1.0];
-  optional float bias_min = 6 [default =0.0];
-  optional float bias_max = 7 [default =0.0];
+  optional float bias_min = 6 [default = 0.0];
+  optional float bias_max = 7 [default = 0.0 ];
   optional uint32 iteration = 8 [default = 0];
 }
 
-message ChannelScaleParameter{
+message ChannelScaleParameter {
   optional bool do_forward = 1 [default = true];
   optional bool do_backward_feature = 2 [default = true];
   optional bool do_backward_scale = 3 [default = true];
@@ -1653,4 +1663,26 @@ message ChannelScaleParameter{
   optional float max_global_scale = 5 [default = 1000.0];
   optional float min_global_scale = 6 [default = 0.0];
   optional float init_global_scale = 7 [default = 1.0];
+}
+message AngularTripletParameter {
+   optional uint32 num_output = 1; // The number of outputs for the layer
+   enum MarginType {
+    SINGLE = 0;
+    DOUBLE = 1;
+    TRIPLE = 2;
+    QUADRUPLE = 3;
+   }
+    optional MarginType type = 2 [default = SINGLE]; 
+    optional FillerParameter weight_filler = 3; // The filler for the weight
+    // The first axis to be lumped into a single inner product computation;
+    // all preceding axes are retained in the output.
+    // May be negative to index from the end (e.g., -1 for the last axis).
+    optional int32 axis = 4 [default = 1];
+    optional float base = 5 [default = 1];
+    optional float gamma = 6 [default = 0];
+    optional float power = 7 [default = 1];
+    optional int32 iteration = 8 [default = 0];
+    optional float lambda_min = 9 [default = 0];
+    optional bool triplet = 10 [default = false];
+    optional bool semihard = 11 [default = false];
 }
